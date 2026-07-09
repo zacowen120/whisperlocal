@@ -1,6 +1,6 @@
-// Pulse 517 service worker — network-first so the daily scout's fresh build shows,
+// Whisperit service worker — network-first so the daily scout's fresh build shows,
 // cache fallback so the app still opens offline.
-const CACHE = 'pulse517-v1';
+const CACHE = 'whisperit-v1';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', (e) => {

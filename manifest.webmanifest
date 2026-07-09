@@ -1,6 +1,6 @@
 {
-  "name": "WhisperLocal",
-  "short_name": "WhisperLocal",
+  "name": "Whisperit",
+  "short_name": "Whisperit",
   "description": "Never-miss-anything Lansing day planner and activity radar.",
   "lang": "en",
   "start_url": "./index.html",
