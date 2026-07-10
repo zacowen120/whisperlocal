@@ -1,6 +1,6 @@
 // The Whisperer service worker — network-first so the daily scout's fresh build shows,
 // cache fallback so the app still opens offline.
-const CACHE = 'whisperer-v5';
+const CACHE = 'whisperer-v6';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png', './favicon.ico'];
 
 self.addEventListener('install', (e) => {
