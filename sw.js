@@ -1,7 +1,7 @@
-// Whisperit service worker — network-first so the daily scout's fresh build shows,
+// The Whisperer service worker — network-first so the daily scout's fresh build shows,
 // cache fallback so the app still opens offline.
-const CACHE = 'whisperit-v1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
+const CACHE = 'whisperer-v5';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png', './favicon.ico'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
