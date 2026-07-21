@@ -55,9 +55,17 @@ self.addEventListener('fetch', (e) => {
           // this the browser is free to decide the fetch event is finished and suspend the worker before the
           // write lands, which iOS does eagerly. The online path would still be correct, but the OFFLINE copy
           // could sit one revision behind forever despite the phone having been online the whole time.
-          // Guarded: waitUntil throws InvalidStateError if the event is no longer active, and a throw here
-          // would take the whole response down with it, turning a stale-cache nuisance into a failed request.
-          try { e.waitUntil(write); } catch (err) { /* event already settled; the write is still in flight */ }
+          // Guarded, and the guard matters more than it looks: waitUntil throws InvalidStateError once the event
+          // is no longer active, and an uncaught throw here escapes into the .catch below, which would DISCARD the
+          // good network response we already have and serve the stale cached copy instead . the exact "shipped
+          // work looks broken" failure this whole change exists to stop.
+          // Honest about what the catch does NOT do: it stops the throw, it does not restore the lifetime
+          // guarantee. On that path the write is an orphaned promise that may or may not finish before the worker
+          // sleeps. Worst case is an offline copy one revision behind, never a wrong response.
+          // The clean version, next time this file is touched: call waitUntil ONCE, synchronously, at the top of
+          // the fetch handler with a promise resolved later, so it can never be too late to call. Not done now
+          // because every exit path would have to resolve it, and a missed path pins the worker awake for good.
+          try { e.waitUntil(write); } catch (err) { /* too late to extend the event; the write races the worker */ }
         }
         return res;
       })
