@@ -12,7 +12,7 @@
 // launch crawl for no benefit. Freshness is only ever a question for the HTML.
 //
 // Bump CACHE on any change here, the activate handler purges every other cache name.
-const CACHE = 'whisperer-v12';
+const CACHE = 'whisperer-v13';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png', './favicon.ico'];
 
 // The app is ONE html file, so "is this the page" is the only freshness question there is.
@@ -50,7 +50,14 @@ self.addEventListener('fetch', (e) => {
         // Only ever cache a real response. Caching an error page would serve that error back offline forever.
         if (res && res.ok) {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+          const write = caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+          // waitUntil, NOT fire and forget. respondWith resolves the moment `res` is returned below, so without
+          // this the browser is free to decide the fetch event is finished and suspend the worker before the
+          // write lands, which iOS does eagerly. The online path would still be correct, but the OFFLINE copy
+          // could sit one revision behind forever despite the phone having been online the whole time.
+          // Guarded: waitUntil throws InvalidStateError if the event is no longer active, and a throw here
+          // would take the whole response down with it, turning a stale-cache nuisance into a failed request.
+          try { e.waitUntil(write); } catch (err) { /* event already settled; the write is still in flight */ }
         }
         return res;
       })
